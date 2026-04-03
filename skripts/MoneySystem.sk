@@ -1,0 +1,86 @@
+# ============================
+# Name: Advanced Money System
+# Author: qd_ducky
+# Version: 1.0
+# Description: Uses Essentials balance feature to make a clean but good money/banknote system.
+# Dependencies: Essentials, Vault
+# ============================
+
+options:
+    note_name: &2&lMoney Banknote
+    note_item: paper
+    sound_success: entity.experience_orb.pickup
+    sound_error: block.note_block.bass
+
+
+    msg_prefix: &6Server Name                       #Put you own server name here!
+    msg_invalid_amount: &cInvalid amount! &7Allowed: 10, 100, 500, 1000, 10000.
+    msg_insufficient_funds: &cInsufficient funds! &7You have: &a$
+    msg_withdraw_success: &7You withdrew &a$
+    msg_withdraw_suffix: &7into a bank note.
+    msg_deposit_success: &7You redeemed a note for &a$
+    msg_inventory_full: &cYour inventory is full! Please make space first.
+
+
+
+command /withdrawal [<number>]:
+    aliases: /withdraw, /banknote
+    trigger:
+        # Check if amount is specified
+        if arg-1 is not set:
+            send "{@msg_prefix}{@msg_invalid_amount}" to player
+            stop
+
+        if arg-1 is not 10 or 100 or 500 or 1000 or 10000:
+            send "{@msg_prefix}{@msg_invalid_amount}" to player
+            play sound "{@sound_error}" at player
+            stop
+
+        if player's balance < arg-1:
+            send "{@msg_prefix}{@msg_insufficient_funds}%player's balance%" to player
+            play sound "{@sound_error}" at player
+            stop
+
+        if player doesn't have space for {@note_item}:
+            send "{@msg_prefix}{@msg_inventory_full}" to player
+            play sound "{@sound_error}" at player
+            stop
+        remove arg-1 from player's balance
+
+        set {_note} to {@note_item} named "{@note_name}"
+        set line 1 of lore of {_note} to "&7Value: &e$%arg-1%"
+        
+        give player {_note}
+        send "{@msg_prefix}{@msg_withdraw_success}%arg-1% {@msg_withdraw_suffix}" to player
+        play sound "{@sound_success}" at player
+
+
+
+on right click:
+    if player's tool is {@note_item}:
+        if name of player's tool is "{@note_name}":
+            
+            if clicked block is set:
+                stop
+
+            cancel event
+
+            set {_lore_value} to uncolored line 1 of lore of player's tool
+            
+            if {_lore_value} contains "Value: $":
+                replace all "Value: $" with "" in {_lore_value}
+                
+                set {_amount} to {_lore_value} parsed as number
+                
+                if {_amount} is set:
+                    remove 1 of player's tool from player
+                    add {_amount} to player's balance
+                    
+                    send "{@msg_prefix}{@msg_deposit_success}%{_amount}%" to player
+                    play sound "{@sound_success}" at player
+					
+					
+on death of player:
+    if attacker is a player:
+        add 250 to attacker's balance
+        send "&aYou earned $250 for eliminating &c%victim%!" to attacker
