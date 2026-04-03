@@ -70,10 +70,10 @@ A banknote-based money system built around Essentials balance support.
 ### Individual Skripts
 
 * FFA System:
-  👉 https://raw.githubusercontent.com/qd-ducky/Skript-Systems/main/skripts/FfaSystem.sk
+  👉 https://raw.githubusercontent.com/qd-ducky/Advanced-System-Skripts/main/skripts/FfaSystem.sk
 
 * Money System:
-  👉 https://raw.githubusercontent.com/qd-ducky/Skript-Systems/main/skripts/MoneySystem.sk
+  👉 https://raw.githubusercontent.com/qd-ducky/Advanced-System-Skripts/main/skripts/MoneySystem.sk
 
 ---
 
