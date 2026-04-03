@@ -1,0 +1,59 @@
+# ============================
+# Name: Free for all utility skript
+# Author: qd_ducky
+# Version: 1.0
+# Description: Has all the things you need in your ffa server. Map protection, join/leave messages, short and clean death messages and kill tokens on death.
+# ============================
+
+on join:
+    set join message to "&7[&a+&7] &7%player%"
+
+on quit:
+  set quit message to "&7[&4-&7] &7%player%"
+
+
+on place:
+    add location of event-block to {ffa.placedblocks::*}
+
+on break:
+    if {ffa.placedblocks::*} contains location of event-block:
+        remove location of event-block from {ffa.placedblocks::*}
+    else:
+        if player does not have permission "ffa.admin":
+            cancel event
+            send "&cYou can only break blocks placed by players!" to player
+
+
+command /resetffalog:
+    permission: ffa.admin
+    trigger:
+        clear {ffa.placedblocks::*}
+        send "&cFFA block log cleared!"
+
+
+on damage of a player:
+    if "%region at victim%" contains "spawn":
+        cancel event
+        if attacker is a player:
+            send "&cYou cannot attack players here!" to attacker
+			
+			
+on death of player:
+    if attacker is a player:
+        broadcast "<#421574>%attacker% &5ʜᴀꜱ ᴋɪʟʟᴇᴅ <#421574>%victim%"
+    else:
+        if damage cause is block explosion or entity explosion:
+            broadcast "<#421574>%victim% &5ʙʟᴇᴡ ᴜᴘ"
+        else:
+            broadcast "<#421574>%victim% &5ᴅɪᴇᴅ"
+
+
+on death of player:
+    set {_token} to nether star named "&d&lᴋɪʟʟ &5&lᴛᴏᴋᴇɴ" with lore "&5ᴜꜱᴇᴅ ᴛᴏ ʙᴜʏ ɢᴇᴀʀ ᴀᴛ ꜱᴘᴀᴡɴ."
+    if attacker is a player:
+        if attacker can hold {_token}:
+            give {_token} to attacker
+        else:
+            drop {_token} at attacker's location            
+    else:
+        drop {_token} at victim's location
